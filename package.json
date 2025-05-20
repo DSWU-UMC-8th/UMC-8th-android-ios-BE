@@ -1,0 +1,28 @@
+{
+  "name": "umc-8th-android-ios-be",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "android, ios 팀 백엔드 레포",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DSWU-UMC-8th/UMC-8th-android-ios-BE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DSWU-UMC-8th/UMC-8th-android-ios-BE/issues"
+  },
+  "homepage": "https://github.com/DSWU-UMC-8th/UMC-8th-android-ios-BE#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "http-status-codes": "^2.3.0",
+    "mysql2": "^3.14.1"
+  }
+}
