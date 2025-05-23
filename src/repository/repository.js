@@ -27,17 +27,20 @@ export const addUser = async (user) => {
         if (rows.affectedRows <= 0) {
             throw new Error("회원가입에 실패했습니다.");
         }   
+        // 추가된 사용자 정보 가져오기
+        const [users] = await db.query("SELECT * FROM User WHERE id = ?", [rows.insertId]);
+        const newUser = users[0];
+
         return {
-            userId: rows.insertId,
-            username: rows.username,
-            email: rows.email,
-            nickname: rows.nickname,
-            createdAt: rows.created_at,
+            userId: newUser.id,
+            username: newUser.username,
+            email: newUser.email,
+            nickname: newUser.nickname,
+            createdAt: newUser.created_at,
         };
     } catch (err) {
         throw new Error(`사용자 추가 중 오류 발생: (${err})`);
     } finally {
         db.release();
     }
-
 }

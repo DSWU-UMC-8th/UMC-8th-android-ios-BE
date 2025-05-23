@@ -1,4 +1,4 @@
-import {handleRegister} from './controller/controller.js';
+import {handleRegister, handleLogin} from './controller/controller.js';
 
 
 import dotenv from "dotenv";
@@ -20,3 +20,4 @@ app.listen(port, () => {
 });
 
 app.post('/api/register', handleRegister); // 회원가입
+app.get('/api/login', handleLogin); // 로그인
