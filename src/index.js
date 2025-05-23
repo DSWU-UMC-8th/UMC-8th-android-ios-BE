@@ -1,3 +1,6 @@
+import {handleRegister} from './controller/controller.js';
+
+
 import dotenv from "dotenv";
 import express from "express";
 import cors from 'cors';
@@ -15,3 +18,5 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
+
+app.post('/api/register', handleRegister); // 회원가입
