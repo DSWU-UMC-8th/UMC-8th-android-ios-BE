@@ -13,6 +13,12 @@ export const responseFromUser = (user) => {
         username: user.username,
         email: user.email,
         nickname: user.nickname,
-        createdAt: user.createdAt,
+    }
+}
+
+export const bodyToLogin = (body) => {
+    return {
+        username: body.username,
+        password: body.password,
     }
 }
