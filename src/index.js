@@ -6,10 +6,12 @@ import homerouter from "./routes/home.routes.js";
 import { handleRegister, handleLogin, handleCheckId} from "./controller/controller.js";
 import movieRoutes from "./routes/movie.routes.js";
 
+import reviewRouter from './routes/review.routes.js';
+
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 app.use(cors()); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
@@ -17,6 +19,7 @@ app.use(express.json()); // request의 본문을 json으로 해석할 수 있도
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 
 app.use("/api/home", homerouter);
+app.use('/reviews', reviewRouter);
 
 app.use("/api", movieRoutes);
 

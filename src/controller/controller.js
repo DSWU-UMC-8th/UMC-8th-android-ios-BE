@@ -1,3 +1,4 @@
+
 import { StatusCodes } from "http-status-codes";
 import { bodyToRegister, bodyToLogin} from "../dtos/dtos.js";
 import { register, login, checkId } from "../service/service.js";
@@ -57,3 +58,5 @@ export const handleCheckId = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 }
+
+

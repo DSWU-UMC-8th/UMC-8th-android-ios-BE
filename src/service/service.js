@@ -1,3 +1,4 @@
+
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
@@ -87,4 +88,13 @@ export const checkId = async (username) => {
     }
     return id; // 아이디가 이미 존재
 }
+
+
+import { insertReview, insertReviewPoints } from '../repository/repository.js';
+
+export const writeReview = async (userId, movieId, rating, content, spoiler, pointIds) => {
+  const { conn, reviewId } = await insertReview(userId, movieId, rating, content, spoiler);
+  await insertReviewPoints(conn, reviewId, userId, movieId, pointIds);
+  return reviewId;
+};
 

@@ -1,3 +1,4 @@
+import reviewRouter from '../routes/review.routes.js';
 import pool from "../db.config.js"; // 이름 없이 불러오기 
 
 // 아이디 중복 체크 
@@ -76,3 +77,44 @@ export const getUserByUserId = async (userId) => {
         db.release();
     }
 }
+
+import db from '../config/db.js';
+
+export const insertReview = async (userId, movieId, rating, content, spoiler) => {
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [result] = await conn.query(
+      `INSERT INTO Review (user_id, movie_id, rating, content, is_spoiler, created_at)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [userId, movieId, rating, content, spoiler]
+    );
+
+    const reviewId = result.insertId;
+    return { conn, reviewId };
+  } catch (err) {
+    await conn.rollback();
+    conn.release();
+    throw err;
+  }
+};
+
+export const insertReviewPoints = async (conn, reviewId, userId, movieId, pointIds) => {
+  try {
+    for (const pointId of pointIds) {
+      await conn.query(
+        `INSERT INTO Review_Point (review_id, id, movie_id, point_id)
+         VALUES (?, ?, ?, ?)`,
+        [reviewId, userId, movieId, pointId]
+      );
+    }
+
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
+};
