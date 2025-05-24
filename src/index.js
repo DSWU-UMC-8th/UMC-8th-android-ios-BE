@@ -3,6 +3,7 @@ import express from "express";
 import cors from 'cors';
 import db from "../src/config/db.js"
 import homerouter from "./routes/home.routes.js";
+import {handleRegister, handleLogin} from './controller/controller.js';
 
 dotenv.config();
 
@@ -28,6 +29,11 @@ app.get("/", async (req, res) => {
     res.status(500).send("DB 연결 실패");
   }
 });
+
+
+app.post('/api/register', handleRegister); // 회원가입
+app.post('/api/login', handleLogin); // 로그인
+
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
