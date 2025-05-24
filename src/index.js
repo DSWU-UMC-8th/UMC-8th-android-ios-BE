@@ -35,7 +35,7 @@ app.post('/api/register', handleRegister); // 회원가입
 app.post('/api/login', handleLogin); // 로그인
 
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`listening on port ${port}`);
 });
 
