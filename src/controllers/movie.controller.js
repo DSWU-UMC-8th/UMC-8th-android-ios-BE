@@ -1,7 +1,7 @@
 import {
   fetchMovieById,
-  incrementLikeCount,
-  fetchMovieReviews,
+  //incrementLikeCount,
+  //fetchMovieReviews,
 } from "../services/movie.service.js";
 
 export const getMovieDetail = async (req, res) => {

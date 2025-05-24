@@ -1,12 +1,5 @@
 import db from "../db.config.js";
 
-export const fetchMovieById = async (movieId) => {
-  const [rows] = await db.query("SELECT * FROM Movie WHERE movie_id = ?", [
-    movieId,
-  ]);
-  return rows[0];
-};
-
 export const incrementLikeCount = async (movieId) => {
   await db.query("UPDATE Movie SET likes = likes + 1 WHERE movie_id = ?", [
     movieId,
@@ -17,16 +10,21 @@ export const incrementLikeCount = async (movieId) => {
   return { likes: rows[0].likes };
 };
 
-export const fetchMovieReviews = async (movieId) => {
+export const fetchMovieById = async (movieId) => {
   const [rows] = await db.query(
-    `
-    SELECT Review.review_id, Review.content, Review.rating, Review.created_at,
-           Review.spoiler, Review.emotion_tag AS point, User.nickname
-    FROM Review
-    JOIN User ON Review.id = User.id
-    WHERE Review.movie_id = ?
-    ORDER BY Review.created_at DESC
-  `,
+    `SELECT 
+      movie_id AS movieId,
+      moviename,
+      releasedate AS releaseDate,
+      age,
+      time,
+      content,
+      director,
+      score,
+      actor,
+      poster_url AS movieImage
+    FROM Movie
+    WHERE movie_id = ?`,
     [movieId]
   );
 
