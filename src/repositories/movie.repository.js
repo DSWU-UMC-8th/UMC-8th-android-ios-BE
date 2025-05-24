@@ -17,8 +17,8 @@ export const getRecentlyLikedMovies = async () => {
 };
 
 export const getNowPlayingMovies = async () => {
-    console.log("📦 [repo] getNowPlayingMovies 쿼리 실행");
-    const [rows] = await db.query(`
+  console.log("📦 [repo] getNowPlayingMovies 쿼리 실행");
+  const [rows] = await db.query(`
       SELECT movie_id AS movieId, moviename AS title, poster_url AS posterUrl
       FROM Movie
       WHERE releasedate >= CURDATE() - INTERVAL 30 DAY
@@ -26,12 +26,12 @@ export const getNowPlayingMovies = async () => {
       ORDER BY releasedate DESC
       LIMIT 10
     `);
-    console.log("📦 [repo] 쿼리 결과:", rows);
-    return rows;
-  };
-  
-  export const getTopRatedMovies = async () => {
-    const [rows] = await db.query(`
+  console.log("📦 [repo] 쿼리 결과:", rows);
+  return rows;
+};
+
+export const getTopRatedMovies = async () => {
+  const [rows] = await db.query(`
       SELECT 
         m.movie_id AS movieId,
         m.moviename AS title,
@@ -43,6 +43,19 @@ export const getNowPlayingMovies = async () => {
       ORDER BY score DESC
       LIMIT 10
     `);
-    return rows;
-  };
-  
+  return rows;
+};
+
+export const incrementLikeCount = async (movieId) => {
+  await db.query(
+    `UPDATE Movie SET like_count = like_count + 1 WHERE movie_id = ?`,
+    [movieId]
+  );
+
+  const [rows] = await db.query(
+    `SELECT movie_id, like_count FROM Movie WHERE movie_id = ?`,
+    [movieId]
+  );
+
+  return rows[0];
+};
