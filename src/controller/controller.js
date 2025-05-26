@@ -37,7 +37,7 @@ export const handleLogin = async (req, res) => {
 }
 
 export const handleCheckId = async (req, res) => {  
-    console.log("아이디 중복 확인 요청! ", req.query.id);
+    console.log("아이디 중복 확인 요청!", req.query.username);
     try {
         const id = await checkId(req.query.username);
         if (id) {

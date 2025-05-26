@@ -1,7 +1,8 @@
 export const bodyToRegister = (body) => {
     return {
         username: body.username, // 사용자 아이디 
-        password: body.password, // 평문
+        password: body.password, // 평문'
+        passwordConfirm: body.passwordConfirm, // 비밀번호 확인용 
         email: body.email,
         nickname: body.nickname,
     }

@@ -5,8 +5,30 @@ import {checkUserExist, addUser, getUserByUserId} from "../repository/repository
 import {responseFromUser} from "../dtos/dtos.js";
 import e from "express";
 
+function isValidId(id) {
+  return /^[a-zA-Z0-9]{4,12}$/.test(id);
+}
+
+function isValidPassword(pw) {
+  return /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,20}$/.test(pw);
+}
+
+function isValidNickname(nick) {
+  return nick.length > 0 && nick.length <= 12;
+}
+
 // 회원가입 
 export const register = async (user) => {
+    const { id, password, passwordConfirm, nickname } = user;
+    // 유효성 검사
+    if (!isValidId(id)) 
+        throw new Error("영어와 숫자를 사용하여 4~12자의 아이디를 입력해주세요.");
+    if (!isValidPassword(password)) 
+        throw new Error("영어와 숫자, 특수문자를 조합하여 6~20자로 입력해주세요.");
+    if (password !== passwordConfirm) 
+        throw new Error("비밀번호가 일치하지 않습니다.");
+    if (!isValidNickname(nickname)) 
+        throw new Error("12자 이내로 입력해주세요.");
     
     // 아이디 중복 체크 
     const isUserExist = await checkUserExist(user.username);
@@ -65,3 +87,4 @@ export const checkId = async (username) => {
     }
     return id; // 아이디가 이미 존재
 }
+
