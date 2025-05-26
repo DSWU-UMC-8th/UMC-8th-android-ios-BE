@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { bodyToRegister} from "../dtos/dtos.js";
-import { register} from "../service/service.js";
+import { bodyToRegister, bodyToLogin} from "../dtos/dtos.js";
+import { register, login, checkId } from "../service/service.js";
 
 
 export const handleRegister = async (req, res) => {
@@ -22,14 +22,38 @@ export const handleRegister = async (req, res) => {
 export const handleLogin = async (req, res) => {
     console.log("로그인 요청! ", req.body);
     try{
-        const user = await login(bodyToLogin(req.body));
+        const {token, user} = await login(bodyToLogin(req.body));
+
         res.status(StatusCodes.OK).json({
             isSuccess: "true",
             code: "200",
             message: "로그인에 성공했습니다.",
+            token: token,  
             result: user,
         });
     } catch(err){
         res.status(400).json({error:err.message});
     } 
+}
+
+export const handleCheckId = async (req, res) => {  
+    console.log("아이디 중복 확인 요청! ", req.query.id);
+    try {
+        const id = await checkId(req.query.username);
+        if (id) {
+            res.status(StatusCodes.OK).json({
+                isSuccess: "true",
+                code: "200",
+                message: "이미 사용중인 아이디입니다.",
+            });
+        } else {
+            res.status(StatusCodes.OK).json({
+                isSuccess: "true",
+                code: "200",
+                message: "사용 가능한 아이디입니다.",
+            });
+        }
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 }
