@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import db from "../src/config/db.js";
 import homerouter from "./routes/home.routes.js";
-import { handleRegister, handleLogin } from "./controller/controller.js";
+import { handleRegister, handleLogin, handleCheckId} from "./controller/controller.js";
 import movieRoutes from "./routes/movie.routes.js";
 
 dotenv.config();
@@ -33,6 +33,7 @@ app.get("/", async (req, res) => {
 
 app.post("/api/register", handleRegister); // 회원가입
 app.post("/api/login", handleLogin); // 로그인
+app.get("/api/check-id", handleCheckId); // 아이디 중복 확인
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`listening on port ${port}`);

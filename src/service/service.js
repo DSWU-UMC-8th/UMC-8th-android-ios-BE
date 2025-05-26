@@ -55,3 +55,13 @@ export const login = async (user) => {
         user: responseFromUser(dbUser),
     }
 }
+
+
+// 아이디 중복 확인
+export const checkId = async (username) => {
+    const id = await checkUserExist(username);
+    if (!id) {
+        return null; // 아이디가 사용 가능
+    }
+    return id; // 아이디가 이미 존재
+}
