@@ -3,10 +3,15 @@ import express from "express";
 import cors from "cors";
 import db from "../src/config/db.js";
 import homerouter from "./routes/home.routes.js";
-import { handleRegister, handleLogin, handleCheckId} from "./controller/controller.js";
+import {
+  handleRegister,
+  handleLogin,
+  handleCheckId,
+} from "./controller/controller.js";
 import movieRoutes from "./routes/movie.routes.js";
 
-import reviewRouter from './routes/review.routes.js';
+import reviewRouter from "./routes/review.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -19,9 +24,11 @@ app.use(express.json()); // request의 본문을 json으로 해석할 수 있도
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 
 app.use("/api/home", homerouter);
-app.use('/reviews', reviewRouter);
+app.use("/reviews", reviewRouter);
 
 app.use("/api", movieRoutes);
+
+app.use("/api", userRouter);
 
 app.get("/", async (req, res) => {
   try {
