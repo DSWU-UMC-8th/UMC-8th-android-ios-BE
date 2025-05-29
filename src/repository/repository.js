@@ -1,87 +1,91 @@
-import reviewRouter from '../routes/review.routes.js';
-import pool from "../db.config.js"; // 이름 없이 불러오기 
+// src/repository/repository.js
 
-// 아이디 중복 체크 
+import pool from "../config/db.js";
+
+//// 🔹 사용자 관련 함수 //// 
+
+// 1. 아이디 중복 체크
 export const checkUserExist = async (username) => {
-    let db;
-    try{
-        db = await pool.getConnection();
-        const sql = "SELECT * FROM User WHERE username = ?";
-        const [rows] = await db.query(sql, [username]);
-        if (rows.length > 0) {
-            return rows[0].id; 
-        }
-        else {
-            return null; // 아이디가 존재하지 않는 경우
-        }
+  const conn = await pool.getConnection();
+  try {
+    const sql = "SELECT * FROM User WHERE username = ?";
+    const [rows] = await conn.query(sql, [username]);
+    return rows.length > 0 ? rows[0].id : null;
+  } catch (err) {
+    throw new Error(`아이디 중복 체크 중 오류 발생: ${err.message}`);
+  } finally {
+    conn.release();
+  }
+};
 
-    } catch (err) {
-        throw new Error(`아이디 중복 체크 중 오류 발생: (${err})`);
-    } finally {
-        db.release();
-    }
-}
-
-// 사용자 추가 
+// 2. 사용자 추가
 export const addUser = async (user) => {
-    let db;
-    try{
-        db = await pool.getConnection();
-        const sql = "INSERT INTO User (username, password, email, nickname) VALUES (?, ?, ?, ?)";
-        const [rows] = await db.query(sql, [user.username, user.password, user.email, user.nickname]);
+  const conn = await pool.getConnection();
+  try {
+    const sql = `INSERT INTO User (username, password, email, nickname)
+                 VALUES (?, ?, ?, ?)`;
+    const [result] = await conn.query(sql, [
+      user.username,
+      user.password,
+      user.email,
+      user.nickname,
+    ]);
 
-        if (rows.affectedRows <= 0) {
-            throw new Error("회원가입에 실패했습니다.");
-        }   
-        // 추가된 사용자 정보 가져오기
-        const [users] = await db.query("SELECT * FROM User WHERE id = ?", [rows.insertId]);
-        const newUser = users[0];
-
-        return {
-            userId: newUser.id,
-            username: newUser.username,
-            email: newUser.email,
-            nickname: newUser.nickname,
-            createdAt: newUser.created_at,
-        };
-    } catch (err) {
-        throw new Error(`사용자 추가 중 오류 발생: (${err})`);
-    } finally {
-        db.release();
+    if (result.affectedRows <= 0) {
+      throw new Error("회원가입에 실패했습니다.");
     }
-}
 
-// id로 사용자 정보 가져오기
+    const [rows] = await conn.query("SELECT * FROM User WHERE id = ?", [result.insertId]);
+    const newUser = rows[0];
+
+    return {
+      userId: newUser.id,
+      username: newUser.username,
+      email: newUser.email,
+      nickname: newUser.nickname,
+      createdAt: newUser.created_at,
+    };
+  } catch (err) {
+    throw new Error(`사용자 추가 중 오류 발생: ${err.message}`);
+  } finally {
+    conn.release();
+  }
+};
+
+// 3. 사용자 ID로 정보 가져오기
 export const getUserByUserId = async (userId) => {
-    let db;
-    try{
-        db = await pool.getConnection();
-        const sql = "SELECT * FROM User WHERE id = ?";
-        const [rows] = await db.query(sql, [userId]);
-        if (rows.length <= 0) {
-            throw new Error("존재하지 않는 사용자입니다.");
-        }
-        return {
-            userId: rows[0].id,
-            username: rows[0].username,
-            password: rows[0].password,
-            email: rows[0].email,
-            nickname: rows[0].nickname,
-            status: rows[0].status,
-            createdAt: rows[0].created_at,
-            updatedAt: rows[0].updated_at,
-        };
-    } catch(err){
-        throw new Error(`사용자 정보 조회 중 오류 발생: (${err})`);
-    } finally {
-        db.release();
+  const conn = await pool.getConnection();
+  try {
+    const sql = "SELECT * FROM User WHERE id = ?";
+    const [rows] = await conn.query(sql, [userId]);
+
+    if (rows.length <= 0) {
+      throw new Error("존재하지 않는 사용자입니다.");
     }
-}
 
-import db from '../config/db.js';
+    const user = rows[0];
+    return {
+      userId: user.id,
+      username: user.username,
+      password: user.password,
+      email: user.email,
+      nickname: user.nickname,
+      status: user.status,
+      createdAt: user.created_at,
+      updatedAt: user.updated_at,
+    };
+  } catch (err) {
+    throw new Error(`사용자 정보 조회 중 오류 발생: ${err.message}`);
+  } finally {
+    conn.release();
+  }
+};
 
+//// 🔹 리뷰 관련 함수 ////
+
+// 4. 리뷰 등록
 export const insertReview = async (userId, movieId, rating, content, spoiler) => {
-  const conn = await db.getConnection();
+  const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
@@ -96,10 +100,11 @@ export const insertReview = async (userId, movieId, rating, content, spoiler) =>
   } catch (err) {
     await conn.rollback();
     conn.release();
-    throw err;
+    throw new Error(`리뷰 등록 중 오류 발생: ${err.message}`);
   }
 };
 
+// 5. 리뷰 감정 포인트 등록
 export const insertReviewPoints = async (conn, reviewId, userId, movieId, pointIds) => {
   try {
     for (const pointId of pointIds) {
@@ -113,7 +118,7 @@ export const insertReviewPoints = async (conn, reviewId, userId, movieId, pointI
     await conn.commit();
   } catch (err) {
     await conn.rollback();
-    throw err;
+    throw new Error(`감정 포인트 등록 중 오류 발생: ${err.message}`);
   } finally {
     conn.release();
   }

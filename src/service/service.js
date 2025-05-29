@@ -50,34 +50,27 @@ export const register = async (user) => {
     return responseFromUser(userData);
 }
 
-// 로그인 
 export const login = async (user) => {
-    // 아이디 존재 여부 확인  
-    const userId = await checkUserExist(user.username);
-    if (!userId) {
-        throw new Error("존재하지 않는 아이디입니다.");
-    }
+  const userId = await checkUserExist(user.username);
+  if (!userId) throw new Error("존재하지 않는 아이디입니다.");
 
-    const dbUser = await getUserByUserId(userId);
+  const dbUser = await getUserByUserId(userId);
 
-    // 비밀번호 일치 여부 확인
-    const isPasswordValid = await bcrypt.compare(user.password, dbUser.password); // 사용자가 입력한 비밀번호(평문)와 DB에 저장된 비밀번호(해시) 비교
-    if (!isPasswordValid) {
-        throw new Error("비밀번호가 일치하지 않습니다.");
-    }
+  const isPasswordValid = await bcrypt.compare(user.password, dbUser.password);
+  if (!isPasswordValid) throw new Error("비밀번호가 일치하지 않습니다.");
 
-    // JWT 토큰 생성
-    const token = jwt.sign(
-        {id: user.id, username: user.username},
-        process.env.JWT_SECRET_KEY, // 비밀키
-        {expiresIn: process.env.JWT_EXPIRES_IN} // 만료 시간
-    );
+  const token = jwt.sign(
+    { id: dbUser.userId, username: dbUser.username }, // ✅ 수정 포인트
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
+  );
 
-    return {
-        token: token,
-        user: responseFromUser(dbUser),
-    }
-}
+  return {
+    token,
+    user: responseFromUser(dbUser),
+  };
+};
+
 
 
 // 아이디 중복 확인
@@ -92,9 +85,10 @@ export const checkId = async (username) => {
 
 import { insertReview, insertReviewPoints } from '../repository/repository.js';
 
-export const writeReview = async (userId, movieId, rating, content, spoiler, pointIds) => {
+export const writeReview = async (userId, movieId, rating, content, spoiler, feelingTags) => {
   const { conn, reviewId } = await insertReview(userId, movieId, rating, content, spoiler);
-  await insertReviewPoints(conn, reviewId, userId, movieId, pointIds);
+  await insertReviewPoints(conn, reviewId, userId, movieId, feelingTags);
   return reviewId;
 };
+
 

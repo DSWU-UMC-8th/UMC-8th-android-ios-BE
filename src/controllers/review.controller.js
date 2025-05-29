@@ -1,17 +1,16 @@
+// src/controller/review.controller.js
 import { writeReview } from "../service/service.js";
 
 export const postReview = async (req, res) => {
   try {
-    const userId = req.user.id; // ← JWT 미들웨어 통과한 유저 ID
+    const userId = req.user.id;
+    const { movie_id, rating, content, spoiler, feeling_tags } = req.body;
 
-    const { movie_id, rating, content, spoiler, point_ids } = req.body;
-
-    // 유효성 검사 (간단하게 예시)
-    if (!movie_id || !rating || !content || point_ids?.length === 0) {
+    if (!movie_id || !rating || !content || !Array.isArray(feeling_tags) || feeling_tags.length === 0) {
       return res.status(400).json({ message: "입력값이 부족합니다." });
     }
 
-    const reviewId = await writeReview(userId, movie_id, rating, content, spoiler, point_ids);
+    const reviewId = await writeReview(userId, movie_id, rating, content, spoiler, feeling_tags);
 
     res.status(201).json({
       message: "리뷰 등록 완료",
